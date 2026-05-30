@@ -15,6 +15,10 @@ import streamlit as st
 
 import gdown
 
+from pathlib import Path
+import streamlit as st
+import gdown
+
 DB_FILE = Path("spectrum_fibsuccess_headers.sqlite3")
 
 GDRIVE_FILE_ID = "1-A66x7YfubrS6yDPNBcJrsEPZRWGQtvT"
@@ -27,19 +31,28 @@ def ensure_database():
 
     st.info("Downloading SQLite database from Google Drive...")
 
-    gdown.download(
+    output = gdown.download(
         DB_URL,
         str(DB_FILE),
         quiet=False,
-        fuzzy=True,
     )
 
+    if output is None:
+        st.error("gdown returned None. Check Google Drive sharing permissions.")
+        st.stop()
+
     if not DB_FILE.exists() or DB_FILE.stat().st_size < 200 * 1024 * 1024:
-        st.error("Database download failed or file is incomplete.")
+        st.error(
+            f"Database download failed or incomplete. "
+            f"Size = {DB_FILE.stat().st_size / 1024**2:.2f} MB"
+            if DB_FILE.exists()
+            else "Database file was not created."
+        )
         st.stop()
 
 
 ensure_database()
+
 
 
 
