@@ -9,8 +9,39 @@ import plotly.express as px
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
+import subprocess
+from pathlib import Path
+import streamlit as st
 
+DB_FILE = Path("spectrum_fibsuccess_headers.sqlite3")
 
+def ensure_lfs_file():
+    if DB_FILE.exists() and DB_FILE.stat().st_size > 1024 * 1024:
+        return
+
+    st.warning("SQLite database not found or only LFS pointer found. Pulling Git LFS file...")
+
+    subprocess.run(["git", "lfs", "install"], check=False)
+    result = subprocess.run(
+        ["git", "lfs", "pull"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    st.text(result.stdout)
+    st.text(result.stderr)
+
+ensure_lfs_file()
+
+from pathlib import Path
+
+DB_FILE = Path("spectrum_fibsuccess_headers.sqlite3")
+
+print("Database exists:", DB_FILE.exists())
+
+if DB_FILE.exists():
+    print("Database size (MB):", DB_FILE.stat().st_size / 1024**2)
 # ============================================================
 # CONFIG
 # ============================================================
