@@ -13,30 +13,35 @@ import subprocess
 from pathlib import Path
 import streamlit as st
 
+import gdown
+
 DB_FILE = Path("spectrum_fibsuccess_headers.sqlite3")
 
-def ensure_lfs_file():
-    if DB_FILE.exists() and DB_FILE.stat().st_size > 1024 * 1024:
+GDRIVE_FILE_ID = "1-A66x7YfubrS6yDPNBcJrsEPZRWGQtvT"
+DB_URL = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
+
+
+def ensure_database():
+    if DB_FILE.exists() and DB_FILE.stat().st_size > 200 * 1024 * 1024:
         return
 
-    st.warning("SQLite database not found or only LFS pointer found. Pulling Git LFS file...")
+    st.info("Downloading SQLite database from Google Drive...")
 
-    subprocess.run(["git", "lfs", "install"], check=False)
-    result = subprocess.run(
-        ["git", "lfs", "pull"],
-        capture_output=True,
-        text=True,
-        check=False,
+    gdown.download(
+        DB_URL,
+        str(DB_FILE),
+        quiet=False,
+        fuzzy=True,
     )
 
-    st.text(result.stdout)
-    st.text(result.stderr)
+    if not DB_FILE.exists() or DB_FILE.stat().st_size < 200 * 1024 * 1024:
+        st.error("Database download failed or file is incomplete.")
+        st.stop()
 
-ensure_lfs_file()
 
-from pathlib import Path
+ensure_database()
 
-DB_FILE = Path("spectrum_fibsuccess_headers.sqlite3")
+
 
 print("Database exists:", DB_FILE.exists())
 
@@ -46,7 +51,6 @@ if DB_FILE.exists():
 # CONFIG
 # ============================================================
 
-DB_FILE = Path("spectrum_fibsuccess_headers.sqlite3")
 
 VALID_FIELDS = [
     "eFEDS_1", "eFEDS_2", "eFEDS_3", "eFEDS_4", "eFEDS_5", "eFEDS_6",
