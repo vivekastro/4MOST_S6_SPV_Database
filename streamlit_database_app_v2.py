@@ -142,6 +142,9 @@ with st.expander("About this database and tables", expanded=False):
         ```text
         one source  →  many spectra / exposures
         ```
+        ```text
+        Database maintained by Vivek(getkeviv@gmail.com/vivek.m@iiap.res.in). Please contact for additional feature requests. 
+        ```
         """
     )
 
