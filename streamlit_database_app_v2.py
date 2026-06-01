@@ -84,7 +84,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.title("4MOST SPV SQL Explorer")
+st.title("4MOST S6 Survey - SPV SQL Explorer")
 
 if not DB_FILE.exists():
     st.error(f"SQLite file not found: `{DB_FILE}`")
